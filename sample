@@ -1,18 +1,9 @@
-import pandas as pd
+def check_option_clicked(bot_options, user_response):
+    options = bot_options.split('|')
+    for option in options:
+        if option.lower() in user_response.lower():
+            return True
+    return False
 
-# Load the data into pandas dataframe
-df = pd.read_csv('data.csv')
-
-# Define a function to check if user clicked on the option or not
-def check_option_clicked(row):
-    # If transcript 1 of bot text has options, check if transcript 2 of human text has clicked on any option
-    if 'yes' in row['bot_text'].lower() or 'no' in row['bot_text'].lower():
-        if 'clicked' in row['human_text'].lower():
-            return 1  # option clicked
-    return 0  # option not clicked
-
-# Create a new column 'clicked_option' based on the function check_option_clicked
-df['clicked_option'] = df.apply(check_option_clicked, axis=1)
-
-# Print the updated dataframe
-print(df.head())
+# apply the function to the dataframe and create a new column 'option_clicked'
+df['option_clicked'] = df.apply(lambda x: check_option_clicked(x['bot_text'], x['human_text']), axis=1)
