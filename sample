@@ -1,9 +1,25 @@
-def check_option_clicked(bot_options, user_response):
-    options = bot_options.split('|')
-    for option in options:
-        if option.lower() in user_response.lower():
-            return True
-    return False
+import pandas as pd
 
-# apply the function to the dataframe and create a new column 'option_clicked'
-df['option_clicked'] = df.apply(lambda x: check_option_clicked(x['bot_text'], x['human_text']), axis=1)
+# create sample data
+data = {'contextid': [123, 123, 456, 789, 789],
+        'transcript_index': [1, 2, 1, 1, 2],
+        'bot_text': ['options: yes|no', 'how can I assist you?', 'options: agree|disagree', 'options: A|B|C', 'I don\'t understand'],
+        'human_text': ['can you explain more?', 'I didn\'t click on any option', 'I agree with that', 'I clicked on B', 'Can you repeat that?']}
+df = pd.DataFrame(data)
+
+# create a new column to store the clicked options
+df['clicked_options'] = ""
+
+# loop through each context id and transcript 1
+for context_id, group in df[df['transcript_index'] == 1].groupby('contextid'):
+    options = group['bot_text'].str.extract('options: (.*)', expand=False).iloc[0].split('|')
+    clicked_options = []
+    for index, row in group.iterrows():
+        transcript2 = df[(df['contextid'] == context_id) & (df['transcript_index'] == 2)]['human_text'].iloc[0]
+        for option in options:
+            if f'click: {option}' in transcript2:
+                clicked_options.append(option)
+    df.loc[(df['contextid'] == context_id) & (df['transcript_index'] == 1), 'clicked_options'] = '|'.join(clicked_options)
+
+# print the output
+print(df)
