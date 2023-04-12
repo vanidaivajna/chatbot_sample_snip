@@ -67,3 +67,19 @@ bigrams = [item for sublist in df["Bigrams"].tolist() for item in sublist]
 # Generate the word cloud from the list of bigrams
 wordcloud = WordCloud(width=800, height=400, max_words=50, background_color="white").generate_from_frequencies(nltk.FreqDist(bigrams))
 
+import pandas as pd
+from wordcloud import WordCloud
+
+# Load the data into a Pandas DataFrame
+data = pd.read_csv('data.csv')
+
+# Extract the text column from the DataFrame as a list
+text = data['text'].tolist()
+
+# Tokenize the text and generate bigrams
+tokens = [word.lower() for sent in text for word in sent.split()]
+bigrams = list(nltk.bigrams(tokens))
+bigram_strings = ["_".join(bigram) for bigram in bigrams]
+
+# Generate the word cloud from the list of bigram strings
+wordcloud = WordCloud(width=800, height=400, max_words=50, background_color="white").generate(" ".join(bigram_strings))
