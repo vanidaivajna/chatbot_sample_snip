@@ -17,3 +17,12 @@ def fill_with_present_value(group):
 
 # Apply the fill_with_present_value function to each group in the dataframe
 df_filled = grouped_df.apply(fill_with_present_value)
+
+
+#-----------------------
+def count_words(text):
+    words = text.split()
+    return len(words)
+
+# Apply the function to the 'text' column
+df['word_count'] = df['text'].apply(count_words)
