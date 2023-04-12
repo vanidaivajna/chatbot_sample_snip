@@ -93,3 +93,49 @@ df["Trigrams"] = df["Tokens"].apply(lambda x: TrigramCollocationFinder.from_word
 
 # Print the resulting dataframe
 print(df)
+
+
+
+
+
+
+
+
+
+
+
+
+import pandas as pd
+import nltk
+from nltk import word_tokenize
+from nltk.collocations import BigramAssocMeasures, BigramCollocationFinder
+from wordcloud import WordCloud
+
+# Load text data as a pandas dataframe
+df = pd.DataFrame({
+    "Text": [
+        "The quick brown fox jumps over the lazy dog.",
+        "The lazy dog, peeved to be labeled lazy, jumped quickly over the sleeping cat.",
+        "The quick brown fox runs beside the slow hedgehog."
+    ]
+})
+
+# Tokenize the text in the dataframe
+df["Tokens"] = df["Text"].apply(word_tokenize)
+
+# Generate bigrams for each row in the dataframe
+bigram_measures = BigramAssocMeasures()
+df["Bigrams"] = df["Tokens"].apply(lambda x: BigramCollocationFinder.from_words(x).nbest(bigram_measures.raw_freq, 10))
+
+# Flatten the list of bigrams
+bigrams = [item for sublist in df["Bigrams"].tolist() for item in sublist]
+
+# Generate the word cloud from the list of bigrams
+wordcloud = WordCloud(width=800, height=400, max_words=50, background_color="white").generate_from_frequencies(nltk.FreqDist(bigrams))
+
+# Display the word cloud
+import matplotlib.pyplot as plt
+plt.figure(figsize=(10, 5))
+plt.imshow(wordcloud, interpolation="bilinear")
+plt.axis("off")
+plt.show()
