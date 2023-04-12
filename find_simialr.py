@@ -1,3 +1,48 @@
+import pandas as pd
+from nltk.tokenize import word_tokenize
+from nltk.corpus import words
+
+# Load the data into a Pandas DataFrame
+data = pd.read_csv('chatbot_data.csv')
+
+# Get the list of known words from the nltk.corpus.words corpus
+word_list = set(words.words())
+
+# Define a function to check for typos in a sentence
+def check_typos(sentence):
+    # Tokenize the sentence into words
+    tokens = word_tokenize(sentence)
+    
+    # Get a list of words that are not in the word list
+    misspelled = [word for word in tokens if word.lower() not in word_list]
+    
+    # If there are any misspelled words, return them as a string, otherwise return None
+    if len(misspelled) > 0:
+        return (True, ", ".join(misspelled))
+    else:
+        return (False, None)
+
+# Apply the function to the 'human_text' column of the DataFrame and create two new columns with the results
+data[['contains_typos', 'typo_words']] = data['human_text'].apply(check_typos).apply(pd.Series)
+
+# Convert the 'contains_typos' column to 'Yes' or 'No' instead of True or False
+data['contains_typos'] = data['contains_typos'].map({True: 'Yes', False: 'No'})
+
+# Print the first 10 rows of the DataFrame to check the results
+print(data.head(10))
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 import pandas as pd
 import nltk
