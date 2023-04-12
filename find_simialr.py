@@ -1,4 +1,47 @@
 import pandas as pd
+import torch
+from transformers import AutoTokenizer, AutoModel
+
+# Load the BERT model and tokenizer
+model_name = "bert-base-uncased"
+tokenizer = AutoTokenizer.from_pretrained(model_name)
+model = AutoModel.from_pretrained(model_name)
+
+# Load the data into a Pandas dataframe
+data = pd.read_csv("my_data.csv")
+
+# Define a function to compute the similarity between two sentences
+def compute_similarity(sentence1, sentence2):
+    tokens1 = tokenizer.encode_plus(sentence1, add_special_tokens=True, return_tensors="pt")
+    tokens2 = tokenizer.encode_plus(sentence2, add_special_tokens=True, return_tensors="pt")
+    with torch.no_grad():
+        output1 = model(**tokens1)[0]
+        output2 = model(**tokens2)[0]
+    cosine_sim = torch.nn.functional.cosine_similarity(output1.mean(dim=1), output2.mean(dim=1))
+    return cosine_sim.item()
+
+# Apply the similarity function to the dataframe
+data["similarity"] = data.apply(lambda x: compute_similarity(x["sentence1"], x["sentence2"]), axis=1)
+
+# Print the dataframe with the similarity scores
+print(data)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+import pandas as pd
 from nltk.tokenize import word_tokenize
 from nltk.corpus import words
 
