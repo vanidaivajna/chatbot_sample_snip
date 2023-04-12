@@ -34,3 +34,24 @@ def count_words(text):
 
 # Apply the function to the 'text' column
 df['word_count'] = df['text'].apply(count_words)
+
+
+
+import pandas as pd
+
+# Create sample dataframe
+data = {'a': [1, 2, 3],
+        'b': [4, 5, 6],
+        'c': ['red', 'green', 'blue'],
+        'd': ['small', 'medium', 'large'],
+        'e': ['circle', 'square', 'triangle']}
+
+df = pd.DataFrame(data)
+
+# Melt columns c, d, and e into a single column called Category
+df_melt = pd.melt(df, id_vars=['a', 'b'], value_vars=['c', 'd', 'e'], var_name='Category')
+
+# Drop the original columns c, d, and e
+df_melt = df_melt.drop(['variable'], axis=1)
+
+print(df_melt)
