@@ -1,3 +1,43 @@
+
+import pandas as pd
+import nltk
+
+# Load the data into a Pandas DataFrame
+data = pd.read_csv('data.csv')
+
+# Define a function to check the grammar of a sentence using nltk.parse
+def check_grammar(sentence):
+    # Tokenize the sentence
+    tokens = nltk.word_tokenize(sentence)
+    
+    # Parse the sentence and create a DependencyGraph
+    try:
+        parser = nltk.parse.corenlp.CoreNLPParser()
+        parse = next(parser.raw_parse(sentence))
+        graph = parse.to_dependency_graph()
+        return True
+    except:
+        return False
+
+# Apply the function to the 'text' column of the DataFrame and create a new column with the results
+data['is_grammatically_correct'] = data['text'].apply(check_grammar)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 import pandas as pd
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.cluster import KMeans
