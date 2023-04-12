@@ -26,3 +26,11 @@ def count_words(text):
 
 # Apply the function to the 'text' column
 df['word_count'] = df['text'].apply(count_words)
+
+
+def count_words(text):
+    words = text.split()
+    return len(words)
+
+# Apply the function to the 'text' column
+df['word_count'] = df['text'].apply(count_words)
