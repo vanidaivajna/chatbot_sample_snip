@@ -211,3 +211,31 @@ bigram_strings = ["_".join(bigram) for bigram in bigrams]
 
 # Generate the word cloud from the list of bigram strings
 wordcloud = WordCloud(width=800, height=400, max_words=50, background_color="white").generate(" ".join(bigram_strings))
+
+
+
+
+
+
+#------------------------
+import pandas as pd
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.cluster import KMeans
+
+# Read in the sentences from a pandas column
+df = pd.read_csv('data.csv')
+sentences = df['column_name'].tolist()
+
+# Convert sentences to sentence embeddings using TF-IDF
+vectorizer = TfidfVectorizer()
+X = vectorizer.fit_transform(sentences)
+
+# Cluster the sentence embeddings using K-Means
+kmeans = KMeans(n_clusters=3)
+kmeans.fit(X)
+
+# Get the cluster labels for each sentence
+labels = kmeans.predict(X)
+
+# Add the cluster labels to the original DataFrame
+df['cluster_label'] = labels
