@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 import json
 import random
+from sklearn.metrics import classification_report
 from sklearn.model_selection import KFold
 
 import tensorflow as tf
@@ -65,10 +66,25 @@ def create_model():
 
 # Train and evaluate the model on each fold
 fold_accuracies = []
+fold_f1_scores = []
+fold_precisions = []
+fold_recalls = []
+
 for i, (train_indices, val_indices) in enumerate(folds):
     print(f"Training fold {i+1}")
     df_train = df_patterns.iloc[train_indices].reset_index(drop=True)
     df_val = df_patterns.iloc[val_indices].reset_index(drop=True)
 
     train_input_ids = np.zeros((len(df_train), seq_len))
-    train_attention_masks = np.zeros
+    train_attention_masks = np.zeros((len(df_train), seq_len))
+
+    for j, pattern in enumerate(df_train['text']):
+        input_ids, attention_mask = tokenize_inputs(pattern)
+        train_input_ids[j, :] = input_ids
+        train_attention_masks[j, :] = attention_mask
+
+    val_input_ids = np.zeros((len(df_val), seq_len))
+    val_attention_masks = np.zeros((len(df_val), seq_len))
+
+    for j, pattern in enumerate(df_val['text']):
+        input_ids
