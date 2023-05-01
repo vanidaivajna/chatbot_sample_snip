@@ -8,7 +8,7 @@ from sklearn.model_selection import KFold
 import tensorflow as tf
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.metrics import CategoricalAccuracy
-from tensorflow.keras.callbacks import EarlyStopping
+from tensorflow.keras.callbacks import EarlyStopping, Callback
 
 from transformers import BertTokenizer, TFAutoModel
 
@@ -64,6 +64,11 @@ def create_model():
     model.compile(optimizer=Adam(lr=2e-5), loss='categorical_crossentropy', metrics=[CategoricalAccuracy()])
     return model
 
+# Define a callback function to print the training progress for each epoch
+class PrintEpochProgress(Callback):
+    def on_epoch_end(self, epoch, logs=None):
+        print(f"Finished epoch {epoch+1}/{num_epochs} - loss: {logs['loss']:.4f} - accuracy: {logs['categorical_accuracy']:.4f}")
+
 # Train and evaluate the model on each fold
 fold_accuracies = []
 fold_f1_scores = []
@@ -87,4 +92,41 @@ for i, (train_indices, val_indices) in enumerate(folds):
     val_attention_masks = np.zeros((len(df_val), seq_len))
 
     for j, pattern in enumerate(df_val['text']):
-        input_ids
+        input_ids, attention_mask = tokenize_inputs(pattern)
+        val_input_ids[j, :] = input_ids
+        val_attention_masks[j, :] = attention_mask
+
+    train_labels = tf.keras.utils.to_categorical(df_train['intent'].factorize()[0])
+    val_labels = tf.keras.utils.to_categorical(df_val['intent'].factorize()[0])
+
+    model = create_model()
+
+    # Train the model for 5 epochs with early stopping
+    num_epochs = 5
+    es = EarlyStopping(monitor='val_loss', mode='min', verbose=1, patience=3)
+    for epoch in range(num_epochs):
+        print(f"Epoch {epoch+1}/{num_epochs}")
+        history = model.fit([train_input_ids, train_attention_masks], train_labels,
+                            validation_data=([val_input_ids, val_attention_masks], val_labels),
+                            epochs=1, batch_size=16, callbacks=[es])
+        print("Training loss: {:.3f}, Training accuracy: {:.3f}".format(history.history['loss'][0], 
+                                                                         history.history['categorical_accuracy'][0]))
+        print("Validation loss: {:.3f}, Validation accuracy: {:.3f}".format(history.history['val_loss'][0], 
+                                                                             history.history['val_categorical_accuracy'][0]))
+
+    # Evaluate the model on the validation set
+    predictions = np.argmax(model.predict([val_input_ids, val_attention_masks]), axis=-1)
+    targets = np.argmax(val_labels, axis=-1)
+    fold_accuracies.append(np.mean(predictions == targets))
+    report = classification_report(targets, predictions, output_dict=True)
+    fold_f1_scores.append(report['macro avg']['f1-score'])
+    fold_precisions.append(report['macro avg']['precision'])
+    fold_recalls.append(report['macro avg']['recall'])
+
+# Print the average performance metrics over all folds
+print("Average accuracy: {:.3f}".format(np.mean(fold_accuracies)))
+print("Average F1-score: {:.3f}".format(np.mean(fold_f1_scores)))
+print("Average precision: {:.3f}".format(np.mean(fold_precisions)))
+print("Average recall: {:.3f}".format(np.mean(fold_recalls)))
+
+
