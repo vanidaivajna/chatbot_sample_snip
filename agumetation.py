@@ -134,3 +134,7 @@ print("Original text:", text)
 print("Paraphrases:")
 for paraphrase in paraphrases:
     print(paraphrase)
+    
+    
+ for i, paraphrase in enumerate(paraphrases):
+    print(f"{i+1}. {paraphrase}")
