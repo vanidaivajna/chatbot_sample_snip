@@ -41,4 +41,55 @@ def augment_sentence(sentence):
     # Return the translated sentence
     return str(translated_blob)
 #----------------------------------------------
+from googletrans import Translator
+
+# initialize translator
+translator = Translator()
+
+# original text
+text = "This is a sample sentence for back-translation."
+
+# translate to Spanish
+translation = translator.translate(text, dest='es').text
+
+# translate back to English
+back_translation = translator.translate(translation, dest='en').text
+
+print("Original text:", text)
+print("Back-translated text:", back_translation)
+
+
+#--------------------------------------------------
+
+from transformers import T5ForConditionalGeneration, T5Tokenizer
+
+# initialize T5 model and tokenizer
+model = T5ForConditionalGeneration.from_pretrained('t5-small')
+tokenizer = T5Tokenizer.from_pretrained('t5-small')
+
+# original text
+text = "This is a sample sentence for paraphrasing."
+
+# generate paraphrases
+inputs = tokenizer.encode("paraphrase: " + text, return_tensors="pt")
+outputs = model.generate(inputs, max_length=50, num_beams=5, early_stopping=True)
+paraphrases = [tokenizer.decode(g, skip_special_tokens=True) for g in outputs]
+
+print("Original text:", text)
+print("Paraphrases:", paraphrases)
+#-------------------------------------------------------
+
+import nlpaug.augmenter.word as naw
+
+# original text
+text = "This is a sample sentence for synonym replacement."
+
+# initialize augmentation model
+aug = naw.SynonymAug(aug_src='wordnet')
+
+# generate augmented text
+augmented_text = aug.augment(text)
+
+print("Original text:", text)
+print("Augmented text:", augmented_text)
 
