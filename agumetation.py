@@ -115,3 +115,22 @@ print("Original sentence:", sentence)
 print("Augmented sentences:")
 for augmented_sentence in augmented_sentences:
     print(augmented_sentence)
+#----------------------
+from transformers import T5ForConditionalGeneration, T5Tokenizer
+
+# initialize T5 model and tokenizer
+model = T5ForConditionalGeneration.from_pretrained('t5-small')
+tokenizer = T5Tokenizer.from_pretrained('t5-small')
+
+# original text
+text = "This is a sample sentence for paraphrasing."
+
+# generate paraphrases
+inputs = tokenizer.encode("paraphrase: " + text, return_tensors="pt")
+outputs = model.generate(inputs, max_length=50, num_beams=5, early_stopping=True)
+paraphrases = [tokenizer.decode(g, skip_special_tokens=True) for g in outputs]
+
+print("Original text:", text)
+print("Paraphrases:")
+for paraphrase in paraphrases:
+    print(paraphrase)
