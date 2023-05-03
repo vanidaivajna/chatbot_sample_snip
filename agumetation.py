@@ -93,3 +93,25 @@ augmented_text = aug.augment(text)
 print("Original text:", text)
 print("Augmented text:", augmented_text)
 
+#--------------------------------
+import nlpaug.augmenter.sentence as nas
+import nlpaug.flow as naf
+
+# initialize the augmentation techniques
+aug1 = nas.ContextualWordEmbsForSentenceAug(model_path='bert-base-uncased')
+aug2 = nas.AbstSummAug()
+
+# create an augmentation flow
+flow = naf.Sequential([aug1, aug2], name='Sequential')
+
+# example input sentence
+sentence = 'The quick brown fox jumped over the lazy dog.'
+
+# augment the sentence
+augmented_sentences = flow.augment(sentence, n=3)
+
+# print the augmented sentences
+print("Original sentence:", sentence)
+print("Augmented sentences:")
+for augmented_sentence in augmented_sentences:
+    print(augmented_sentence)
