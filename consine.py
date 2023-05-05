@@ -20,3 +20,13 @@ cosine_sim_matrix = cosine_similarity(tfidf_matrix)
 
 # Print the cosine similarity matrix
 print(cosine_sim_matrix)
+# Iterate over the upper triangle of the cosine similarity matrix
+for i in range(len(df)):
+    for j in range(i+1, len(df)):
+        # If the cosine similarity is above 0.8, drop the corresponding rows and columns from the DataFrame
+        if cosine_sim_matrix[i][j] > 0.8:
+            df = df.drop([j])
+            df = df.reset_index(drop=True)
+
+# Print the updated DataFrame
+print(df)
