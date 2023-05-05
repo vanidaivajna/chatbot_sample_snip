@@ -33,6 +33,67 @@ from transformers import AutoModelWithLMHead, AutoTokenizer
 model = AutoModelWithLMHead.from_pretrained("t5-small")
 tokenizer = AutoTokenizer.from_pretrained("t5-small")
 
+
+#---------------------------------------------
+
+from transformers import AutoModelWithLMHead, AutoTokenizer
+
+# Load the T5 model and tokenizer
+model = AutoModelWithLMHead.from_pretrained("t5-small")
+tokenizer = AutoTokenizer.from_pretrained("t5-small")
+
+# Set the source and target languages for translation
+source_lang = "en"
+target_lang = "fr"
+
+# Define the input sentence to be translated
+input_sentence = "This is a test sentence to be backtranslated."
+
+# Backtranslate the input sentence from English to French
+input_ids = tokenizer.encode(input_sentence, return_tensors="pt")
+backtranslated = model.generate(input_ids=input_ids, 
+                                max_length=128, 
+                                num_beams=4, 
+                                early_stopping=True, 
+                                no_repeat_ngram_size=2, 
+                                do_sample=True, 
+                                top_k=50, 
+                                top_p=0.95, 
+                                temperature=0.7, 
+                                num_return_sequences=1, 
+                                decoder_start_token_id=model.config.decoder_start_token_id, 
+                                eos_token_id=model.config.eos_token_id, 
+                                pad_token_id=model.config.pad_token_id, 
+                                bos_token_id=model.config.bos_token_id, 
+                                use_cache=True)
+backtranslated_sentence = tokenizer.decode(backtranslated[0], skip_special_tokens=True)
+
+# Print the backtranslated sentence in French
+print("Backtranslated sentence in French: ", backtranslated_sentence)
+
+# Translate the backtranslated sentence from French back to English
+input_ids = tokenizer.encode(backtranslated_sentence, return_tensors="pt")
+translated = model.generate(input_ids=input_ids, 
+                             max_length=128, 
+                             num_beams=4, 
+                             early_stopping=True, 
+                             no_repeat_ngram_size=2, 
+                             do_sample=True, 
+                             top_k=50, 
+                             top_p=0.95, 
+                             temperature=0.7, 
+                             num_return_sequences=1, 
+                             decoder_start_token_id=model.config.decoder_start_token_id, 
+                             eos_token_id=model.config.eos_token_id, 
+                             pad_token_id=model.config.pad_token_id, 
+                             bos_token_id=model.config.bos_token_id, 
+                             use_cache=True)
+translated_sentence = tokenizer.decode(translated[0], skip_special_tokens=True)
+
+# Print the original input sentence and the backtranslated sentence in English
+print("Input sentence: ", input_sentence)
+print("Backtranslated sentence in English: ", translated_sentence)
+
 # Set the source and target languages for backtranslation
 source_lang = "en"
 target_lang = "fr"
