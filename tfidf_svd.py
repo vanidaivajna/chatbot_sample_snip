@@ -84,3 +84,7 @@ print('Precision\tRecall\t\tF1 Score')
 for i in range(5):
     print(f'{rf_precision[i]:.4f}\t\t{rf_recall[i]:.4f}\t\t{rf_f1[i]:.4f}')
 print(f'Mean\t\t{sum(rf_precision)/5:.4f}\t\t{sum
+
+# Print the results as a table
+print(f"{'RandomForestClassifier':<30} {'MultinomialNB':<30}")
+print(f"{'Precision':<15} {'Recall':<15} {'F1 Score':<15} {'Precision':<15} {'Recall':<15}
